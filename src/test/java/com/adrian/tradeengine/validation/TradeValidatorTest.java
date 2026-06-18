@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+
 public class TradeValidatorTest {
 
     private final TradeValidator validator = new TradeValidator();
@@ -96,4 +99,42 @@ public class TradeValidatorTest {
 
         assertFalse(validator.isValid(trade));
     }
+
+    @Test
+    void shouldNotThrowForValidTrade() {
+        // Arrange
+        Trade trade = new Trade(
+                "T6",
+                ProductType.FX,
+                1_500_000.0,
+                "EUR",
+                new Counterparty("Bank A"),
+                new Portfolio("Portfolio 1")
+        );
+
+        // Act + Assert
+        validator.validateOrThrow(trade);
+    }
+
+    @Test
+    void shouldThrowWhenTradeIdIsBlank() {
+        // Arrange
+        Trade trade = new Trade(
+                "",
+                ProductType.FX,
+                1_500_000.0,
+                "EUR",
+                new Counterparty("Bank A"),
+                new Portfolio("Portfolio 1")
+        );
+
+        // Act + Assert
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> validator.validateOrThrow(trade)
+        );
+
+        assertTrue(exception.getMessage().contains("Trade ID"));
+    }
+
 }
