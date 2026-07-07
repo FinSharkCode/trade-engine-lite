@@ -5,6 +5,7 @@ import com.adrian.tradeengine.model.Trade;
 import com.adrian.tradeengine.validation.TradeValidator;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TradeImportService {
 
@@ -20,6 +21,6 @@ public class TradeImportService {
         return lines.stream()
                 .map(parser::parseLine)
                 .filter(validator::isValid)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

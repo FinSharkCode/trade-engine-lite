@@ -4,6 +4,7 @@ import com.adrian.tradeengine.io.TradeCsvParser;
 import com.adrian.tradeengine.model.Trade;
 import com.adrian.tradeengine.validation.TradeValidator;
 import org.junit.jupiter.api.Test;
+import java.util.Arrays;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class TradeImportServiceTest {
 
     @Test
     void shouldImportOnlyValidTrades() {
-        List<String> lines = List.of(
+        List<String> lines = Arrays.asList(
                 "T1,FX,1000000,EUR,Bank A,Portfolio 1",
                 "T2,BOND,2000000,EUR,Bank B,Portfolio 1",
                 "T3,FX,0,USD,Bank A,Portfolio 2"
