@@ -35,7 +35,7 @@ public class TradeValidator {
     }
 
     private boolean hasTradeId(Trade trade) {
-        return trade.getTradeId() != null && !trade.getTradeId().isBlank();
+        return hasText(trade.getTradeId());
     }
 
     private boolean hasPositiveNominal(Trade trade) {
@@ -43,7 +43,7 @@ public class TradeValidator {
     }
 
     private boolean hasCurrency(Trade trade) {
-        return trade.getCurrency() != null && !trade.getCurrency().isBlank();
+        return hasText(trade.getCurrency());
     }
 
     private boolean hasCounterparty(Trade trade) {
@@ -52,5 +52,9 @@ public class TradeValidator {
 
     private boolean hasPortfolio(Trade trade) {
         return trade.getPortfolio() != null;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

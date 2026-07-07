@@ -5,6 +5,7 @@ import com.adrian.tradeengine.model.Portfolio;
 import com.adrian.tradeengine.model.ProductType;
 import com.adrian.tradeengine.model.Trade;
 import org.junit.jupiter.api.Test;
+import java.util.Arrays;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class TradeAnalyticsTest {
 
     @Test
     void shouldFilterByProductType() {
-        List<Trade> trades = List.of(
+        List<Trade> trades = Arrays.asList(
                 new Trade("T1", ProductType.FX, 1_000_000.0, "EUR",
                         new Counterparty("Bank A"), new Portfolio("Portfolio 1")),
                 new Trade("T2", ProductType.BOND, 2_000_000.0, "EUR",
@@ -33,7 +34,7 @@ public class TradeAnalyticsTest {
 
     @Test
     void shouldGroupByCounterparty() {
-        List<Trade> trades = List.of(
+        List<Trade> trades = Arrays.asList(
                 new Trade("T1", ProductType.FX, 1_000_000.0, "EUR",
                         new Counterparty("Bank A"), new Portfolio("Portfolio 1")),
                 new Trade("T2", ProductType.BOND, 2_000_000.0, "EUR",
@@ -51,7 +52,7 @@ public class TradeAnalyticsTest {
 
     @Test
     void shouldSumNominalByPortfolio() {
-        List<Trade> trades = List.of(
+        List<Trade> trades = Arrays.asList(
                 new Trade("T1", ProductType.FX, 1_000_000.0, "EUR",
                         new Counterparty("Bank A"), new Portfolio("Portfolio 1")),
                 new Trade("T2", ProductType.BOND, 2_000_000.0, "EUR",

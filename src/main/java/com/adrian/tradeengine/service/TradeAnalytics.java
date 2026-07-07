@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 
 public class TradeAnalytics {
 
-    public List<Trade> filterByProductType(List<Trade> trades, ProductType productType) {
-        return trades.stream()
-                .filter(trade -> trade.getProductType() == productType)
-                .toList();
-    }
+	public List<Trade> filterByProductType(List<Trade> trades, ProductType productType) {
+	    return trades.stream()
+	            .filter(trade -> trade.getProductType() == productType)
+	            .collect(Collectors.toList());
+	}
 
     public Map<String, List<Trade>> groupByCounterparty(List<Trade> trades) {
         return trades.stream()
