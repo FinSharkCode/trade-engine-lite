@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import com.adrian.tradeengine.service.TradeXmlExporter;
 
 @Path("/trades")
 public class TradeResource {
@@ -20,6 +21,7 @@ public class TradeResource {
 
     private final TradeCsvParser parser = new TradeCsvParser();
     private final TradeValidator validator = new TradeValidator();
+    private final TradeXmlExporter xmlExporter = new TradeXmlExporter();
 
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
@@ -56,6 +58,13 @@ public class TradeResource {
         }
 
         return result.toString();
+    }
+    
+    @GET
+    @Path("/xml")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getTradesAsXml() {
+        return xmlExporter.exportTrades(repository.findAll());
     }
 
     private String formatTrade(Trade trade) {

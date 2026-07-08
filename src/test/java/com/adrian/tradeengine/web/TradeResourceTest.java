@@ -59,4 +59,23 @@ public class TradeResourceTest {
         assertTrue(response.contains("Trade already exists"));
         assertTrue(response.contains("T200"));
     }
+    
+    @Test
+    void shouldReturnStoredTradesAsXml() {
+        TradeResource resource = new TradeResource();
+
+        resource.createTrade(
+                "T300,EQUITY,750000,USD,Bank C,Portfolio XML"
+        );
+
+        String response = resource.getTradesAsXml();
+
+        assertTrue(response.contains("<trades>"));
+        assertTrue(response.contains("<tradeId>T300</tradeId>"));
+        assertTrue(response.contains("<productType>EQUITY</productType>"));
+        assertTrue(response.contains("<currency>USD</currency>"));
+        assertTrue(response.contains("<counterparty>"));
+        assertTrue(response.contains("<portfolio>"));
+        assertTrue(response.contains("Portfolio XML"));
+    }
 }
