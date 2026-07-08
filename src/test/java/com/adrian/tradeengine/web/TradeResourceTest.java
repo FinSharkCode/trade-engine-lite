@@ -4,11 +4,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.adrian.tradeengine.service.InMemoryTradeRepository;
+
 public class TradeResourceTest {
 
     @Test
     void shouldStoreValidTrade() {
-        TradeResource resource = new TradeResource();
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
 
         String response = resource.createTrade(
                 "T100,FX,1000000,EUR,Bank A,Portfolio 1"
@@ -20,7 +22,7 @@ public class TradeResourceTest {
 
     @Test
     void shouldReturnStoredTrades() {
-        TradeResource resource = new TradeResource();
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
 
         resource.createTrade(
                 "T101,BOND,2000000,EUR,Bank B,Portfolio 2"
@@ -35,7 +37,7 @@ public class TradeResourceTest {
 
     @Test
     void shouldRejectInvalidTrade() {
-        TradeResource resource = new TradeResource();
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
 
         String response = resource.createTrade(
                 "T102,FX,0,EUR,Bank A,Portfolio 1"
@@ -46,7 +48,7 @@ public class TradeResourceTest {
     
     @Test
     void shouldRejectDuplicateTradeId() {
-        TradeResource resource = new TradeResource();
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
 
         resource.createTrade(
                 "T200,FX,1000000,EUR,Bank A,Portfolio 1"
@@ -62,7 +64,7 @@ public class TradeResourceTest {
     
     @Test
     void shouldReturnStoredTradesAsXml() {
-        TradeResource resource = new TradeResource();
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
 
         resource.createTrade(
                 "T300,EQUITY,750000,USD,Bank C,Portfolio XML"
