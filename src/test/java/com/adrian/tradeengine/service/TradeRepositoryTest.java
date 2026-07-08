@@ -33,4 +33,24 @@ public class TradeRepositoryTest {
         assertEquals("T1", trades.get(0).getTradeId());
         assertEquals(1, repository.count());
     }
+    
+    @Test
+    void shouldDetectExistingTradeId() {
+        TradeRepository repository = new TradeRepository();
+
+        Trade trade = new Trade(
+                "T1",
+                ProductType.FX,
+                1_000_000.0,
+                "EUR",
+                new Counterparty("Bank A"),
+                new Portfolio("Portfolio 1")
+        );
+
+        repository.save(trade);
+
+        assertEquals(true, repository.existsByTradeId("T1"));
+        assertEquals(false, repository.existsByTradeId("UNKNOWN"));
+    }
 }
+

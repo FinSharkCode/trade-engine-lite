@@ -43,4 +43,20 @@ public class TradeResourceTest {
 
         assertTrue(response.contains("Trade is invalid"));
     }
+    
+    @Test
+    void shouldRejectDuplicateTradeId() {
+        TradeResource resource = new TradeResource();
+
+        resource.createTrade(
+                "T200,FX,1000000,EUR,Bank A,Portfolio 1"
+        );
+
+        String response = resource.createTrade(
+                "T200,FX,1500000,EUR,Bank B,Portfolio 2"
+        );
+
+        assertTrue(response.contains("Trade already exists"));
+        assertTrue(response.contains("T200"));
+    }
 }

@@ -14,6 +14,15 @@ public class TradeRepository {
         trades.add(trade);
     }
 
+    public boolean existsByTradeId(String tradeId) {
+        for (Trade trade : trades) {
+            if (trade.getTradeId().equals(tradeId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Trade> findAll() {
         return Collections.unmodifiableList(trades);
     }

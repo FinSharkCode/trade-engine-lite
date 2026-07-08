@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trade Engine Lite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 32px;
+            background-color: #f5f7fa;
+            color: #1f2933;
+        }
+
+        h1 {
+            color: #1f4e79;
+        }
+
+        .container {
+            max-width: 900px;
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            align-self: center;
+        }
+
+        input, select {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1f4e79;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background-color: #163a5a;
+        }
+
+        .message {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 4px;
+            background-color: #eef6ff;
+            border: 1px solid #b7d7f0;
+            white-space: pre-wrap;
+        }
+
+        .trades {
+            margin-top: 24px;
+        }
+
+        pre {
+            background-color: #111827;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+        }
+
+        .hint {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Trade Engine Lite</h1>
+
+    <p class="hint">
+        Simple local GUI for entering trades. The form sends CSV text to the REST endpoint
+        <code>/api/trades</code>.
+    </p>
+
+    <div class="form-grid">
+        <label for="tradeId">Trade ID</label>
+        <input id="tradeId" value="T10">
+
+        <label for="productType">Product Type</label>
+        <select id="productType">
+            <option value="FX">FX</option>
+            <option value="BOND">BOND</option>
+            <option value="EQUITY">EQUITY</option>
+        </select>
+
+        <label for="nominal">Nominal</label>
+        <input id="nominal" type="number" value="1000000">
+
+        <label for="currency">Currency</label>
+        <input id="currency" value="EUR">
+
+        <label for="counterparty">Counterparty</label>
+        <input id="counterparty" value="Bank A">
+
+        <label for="portfolio">Portfolio</label>
+        <input id="portfolio" value="Portfolio 1">
+    </div>
+
+    <button onclick="saveTrade()">Trade speichern</button>
+    <button onclick="loadTrades()">Trades laden</button>
+    <button onclick="fillInvalidTrade()">Ungültigen Trade testen</button>
+
+    <div id="message" class="message">Noch keine Aktion ausgeführt.</div>
+
+    <div class="trades">
+        <h2>Gespeicherte Trades</h2>
+        <pre id="tradesOutput">Noch keine Trades geladen.</pre>
+    </div>
+</div>
+
+<script>
+    function buildCsvLine() {
+        const tradeId = document.getElementById("tradeId").value;
+        const productType = document.getElementById("productType").value;
+        const nominal = document.getElementById("nominal").value;
+        const currency = document.getElementById("currency").value;
+        const counterparty = document.getElementById("counterparty").value;
+        const portfolio = document.getElementById("portfolio").value;
+
+        return tradeId + "," +
+            productType + "," +
+            nominal + "," +
+            currency + "," +
+            counterparty + "," +
+            portfolio;
+    }
+
+    function saveTrade() {
+        const csvLine = buildCsvLine();
+
+        fetch("api/trades", {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: csvLine
+        })
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById("message").textContent = text;
+                loadTrades();
+            })
+            .catch(error => {
+                document.getElementById("message").textContent = "Error: " + error;
+            });
+    }
+
+    function loadTrades() {
+        fetch("api/trades")
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById("tradesOutput").textContent = text;
+            })
+            .catch(error => {
+                document.getElementById("tradesOutput").textContent = "Error: " + error;
+            });
+    }
+
+    function fillInvalidTrade() {
+        document.getElementById("tradeId").value = "T_INVALID";
+        document.getElementById("productType").value = "FX";
+        document.getElementById("nominal").value = "0";
+        document.getElementById("currency").value = "EUR";
+        document.getElementById("counterparty").value = "Bank A";
+        document.getElementById("portfolio").value = "Portfolio 1";
+    }
+</script>
+</body>
+</html>

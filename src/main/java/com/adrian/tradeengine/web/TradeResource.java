@@ -31,6 +31,10 @@ public class TradeResource {
             return "Trade is invalid";
         }
 
+        if (repository.existsByTradeId(trade.getTradeId())) {
+            return "Trade already exists: " + trade.getTradeId();
+        }
+
         repository.save(trade);
 
         return "Trade stored: " + trade.getTradeId();
