@@ -24,6 +24,16 @@ public class InMemoryTradeRepository implements TradeRepository {
         }
         return false;
     }
+    
+    @Override
+    public Trade findByTradeId(String tradeId) {
+        for (Trade trade : trades) {
+            if (trade.getTradeId().equals(tradeId)) {
+                return trade;
+            }
+        }
+        return null;
+    }
 
     @Override
     public List<Trade> findAll() {
@@ -39,4 +49,5 @@ public class InMemoryTradeRepository implements TradeRepository {
     public void clear() {
         trades.clear();
     }
+    
 }

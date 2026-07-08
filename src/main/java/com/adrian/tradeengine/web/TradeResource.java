@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import javax.ws.rs.PathParam;
 
 @Path("/trades")
 public class TradeResource {
@@ -85,4 +86,18 @@ public class TradeResource {
                 + " | " + trade.getCounterparty().getName()
                 + " | " + trade.getPortfolio().getName();
     }
+    
+    @GET
+    @Path("/{tradeId}/xml")
+    @Produces(MediaType.APPLICATION_XML)
+    public String getTradeAsXml(@PathParam("tradeId") String tradeId) {
+        Trade trade = repository.findByTradeId(tradeId);
+
+        if (trade == null) {
+            return "<error>Trade not found: " + tradeId + "</error>";
+        }
+
+        return xmlExporter.exportSingleTrade(trade);
+    }
+    
 }

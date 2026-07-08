@@ -80,4 +80,21 @@ public class TradeResourceTest {
         assertTrue(response.contains("<portfolio>"));
         assertTrue(response.contains("Portfolio XML"));
     }
+    
+    @Test
+    void shouldReturnSingleTradeAsXml() {
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
+
+        resource.createTrade(
+                "T_XML_SINGLE,FX,1000000,EUR,Bank XML Single,Portfolio XML Single"
+        );
+
+        String response = resource.getTradeAsXml("T_XML_SINGLE");
+
+        assertTrue(response.contains("<trades>"));
+        assertTrue(response.contains("<tradeId>T_XML_SINGLE</tradeId>"));
+        assertTrue(response.contains("<counterparty>"));
+        assertTrue(response.contains("Bank XML Single"));
+        assertTrue(response.contains("Portfolio XML Single"));
+    }
 }

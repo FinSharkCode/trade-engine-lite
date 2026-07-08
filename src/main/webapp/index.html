@@ -83,6 +83,27 @@
             font-size: 13px;
             margin-bottom: 20px;
         }
+        
+        .trade-row {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    background-color: #f8fafc;
+		    border: 1px solid #dbe3ec;
+		    border-radius: 4px;
+		    padding: 10px;
+		    margin-bottom: 8px;
+		}
+		
+		.trade-text {
+		    font-family: Consolas, monospace;
+		    font-size: 13px;
+		}
+		
+		.small-button {
+		    padding: 6px 10px;
+		    font-size: 12px;
+		}
     </style>
 </head>
 <body>
@@ -125,9 +146,14 @@
     <div id="message" class="message">Noch keine Aktion ausgeführt.</div>
 
     <div class="trades">
-        <h2>Gespeicherte Trades</h2>
-        <pre id="tradesOutput">Noch keine Trades geladen.</pre>
-    </div>
+    	<h2>Gespeicherte Trades</h2>
+    	<div id="tradesOutput">Noch keine Trades geladen.</div>
+	</div>
+
+	<div class="trades">
+    	<h2>XML für ausgewählten Trade</h2>
+    	<pre id="xmlOutput">Noch kein Trade ausgewählt.</pre>
+	</div>
 </div>
 
 <script>
@@ -171,10 +197,55 @@
         fetch("api/trades")
             .then(response => response.text())
             .then(text => {
-                document.getElementById("tradesOutput").textContent = text;
+                renderTrades(text);
             })
             .catch(error => {
                 document.getElementById("tradesOutput").textContent = "Error: " + error;
+            });
+    }
+    
+    function renderTrades(text) {
+        const output = document.getElementById("tradesOutput");
+        output.innerHTML = "";
+
+        if (!text || text.indexOf("No trades stored") >= 0) {
+            output.textContent = "Noch keine Trades gespeichert.";
+            return;
+        }
+
+        const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+
+        lines.forEach(line => {
+            const tradeId = line.split("|")[0].trim();
+
+            const row = document.createElement("div");
+            row.className = "trade-row";
+
+            const tradeText = document.createElement("div");
+            tradeText.className = "trade-text";
+            tradeText.textContent = line;
+
+            const button = document.createElement("button");
+            button.className = "small-button";
+            button.textContent = "XML anzeigen";
+            button.onclick = function () {
+                loadTradeXml(tradeId);
+            };
+
+            row.appendChild(tradeText);
+            row.appendChild(button);
+            output.appendChild(row);
+        });
+    }
+    
+    function loadTradeXml(tradeId) {
+        fetch("api/trades/" + encodeURIComponent(tradeId) + "/xml")
+            .then(response => response.text())
+            .then(xml => {
+                document.getElementById("xmlOutput").textContent = xml;
+            })
+            .catch(error => {
+                document.getElementById("xmlOutput").textContent = "Error: " + error;
             });
     }
 

@@ -66,6 +66,27 @@ public class H2TradeRepository implements TradeRepository {
             throw new RuntimeException("Could not check trade ID " + tradeId, exception);
         }
     }
+    
+    @Override
+    public Trade findByTradeId(String tradeId) {
+        String sql = "SELECT trade_id, product_type, nominal, currency, counterparty_name, portfolio_name " +
+                "FROM trades WHERE trade_id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, tradeId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapRowToTrade(resultSet);
+                }
+                return null;
+            }
+        } catch (SQLException exception) {
+            throw new RuntimeException("Could not load trade " + tradeId, exception);
+        }
+    }
 
     @Override
     public List<Trade> findAll() {

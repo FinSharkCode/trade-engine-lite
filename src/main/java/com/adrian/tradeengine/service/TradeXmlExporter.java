@@ -51,4 +51,14 @@ public class TradeXmlExporter {
                 .replace("\"", "&quot;")
                 .replace("'", "&apos;");
     }
+    
+    public String exportSingleTrade(Trade trade) {
+        StringBuilder xml = new StringBuilder();
+
+        xml.append("<trades>").append(System.lineSeparator());
+        xml.append(exportTrade(trade));
+        xml.append("</trades>");
+
+        return xml.toString();
+    }
 }

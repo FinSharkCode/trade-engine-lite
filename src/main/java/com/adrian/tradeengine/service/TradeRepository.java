@@ -10,6 +10,8 @@ public interface TradeRepository {
 
     boolean existsByTradeId(String tradeId);
 
+    Trade findByTradeId(String tradeId);
+
     List<Trade> findAll();
 
     int count();
