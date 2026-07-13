@@ -10,6 +10,11 @@ public class TradeTest {
     void shouldCreateTradeCorrectly() {
         Counterparty counterparty = new Counterparty("Bank A");
         Portfolio portfolio = new Portfolio("Portfolio 1");
+        FxTradeDetails productDetails = new FxTradeDetails(
+                "EUR/USD",
+                "2026-07-15",
+                1.08
+        );
 
         Trade trade = new Trade(
                 "T1",
@@ -17,7 +22,8 @@ public class TradeTest {
                 1_000_000.0,
                 "EUR",
                 counterparty,
-                portfolio
+                portfolio,
+                productDetails
         );
 
         assertEquals("T1", trade.getTradeId());
@@ -26,5 +32,6 @@ public class TradeTest {
         assertEquals("EUR", trade.getCurrency());
         assertEquals("Bank A", trade.getCounterparty().getName());
         assertEquals("Portfolio 1", trade.getPortfolio().getName());
+        assertEquals(productDetails, trade.getProductDetails());
     }
 }

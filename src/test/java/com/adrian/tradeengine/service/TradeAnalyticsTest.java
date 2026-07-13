@@ -1,12 +1,14 @@
 package com.adrian.tradeengine.service;
 
+import com.adrian.tradeengine.model.BondTradeDetails;
 import com.adrian.tradeengine.model.Counterparty;
+import com.adrian.tradeengine.model.FxTradeDetails;
 import com.adrian.tradeengine.model.Portfolio;
 import com.adrian.tradeengine.model.ProductType;
 import com.adrian.tradeengine.model.Trade;
 import org.junit.jupiter.api.Test;
-import java.util.Arrays;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +22,19 @@ public class TradeAnalyticsTest {
     void shouldFilterByProductType() {
         List<Trade> trades = Arrays.asList(
                 new Trade("T1", ProductType.FX, 1_000_000.0, "EUR",
-                        new Counterparty("Bank A"), new Portfolio("Portfolio 1")),
+                        new Counterparty("Bank A"),
+                        new Portfolio("Portfolio 1"),
+                        new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)),
+
                 new Trade("T2", ProductType.BOND, 2_000_000.0, "EUR",
-                        new Counterparty("Bank B"), new Portfolio("Portfolio 1")),
+                        new Counterparty("Bank B"),
+                        new Portfolio("Portfolio 1"),
+                        new BondTradeDetails("DE0001234567", "Issuer A", "2030-12-31", 0.035)),
+
                 new Trade("T3", ProductType.FX, 500_000.0, "USD",
-                        new Counterparty("Bank A"), new Portfolio("Portfolio 2"))
+                        new Counterparty("Bank A"),
+                        new Portfolio("Portfolio 2"),
+                        new FxTradeDetails("USD/JPY", "2026-07-16", 155.25))
         );
 
         List<Trade> fxTrades = analytics.filterByProductType(trades, ProductType.FX);
@@ -36,11 +46,19 @@ public class TradeAnalyticsTest {
     void shouldGroupByCounterparty() {
         List<Trade> trades = Arrays.asList(
                 new Trade("T1", ProductType.FX, 1_000_000.0, "EUR",
-                        new Counterparty("Bank A"), new Portfolio("Portfolio 1")),
+                        new Counterparty("Bank A"),
+                        new Portfolio("Portfolio 1"),
+                        new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)),
+
                 new Trade("T2", ProductType.BOND, 2_000_000.0, "EUR",
-                        new Counterparty("Bank B"), new Portfolio("Portfolio 1")),
+                        new Counterparty("Bank B"),
+                        new Portfolio("Portfolio 1"),
+                        new BondTradeDetails("DE0001234567", "Issuer A", "2030-12-31", 0.035)),
+
                 new Trade("T3", ProductType.FX, 500_000.0, "USD",
-                        new Counterparty("Bank A"), new Portfolio("Portfolio 2"))
+                        new Counterparty("Bank A"),
+                        new Portfolio("Portfolio 2"),
+                        new FxTradeDetails("USD/JPY", "2026-07-16", 155.25))
         );
 
         Map<String, List<Trade>> grouped = analytics.groupByCounterparty(trades);
@@ -54,11 +72,19 @@ public class TradeAnalyticsTest {
     void shouldSumNominalByPortfolio() {
         List<Trade> trades = Arrays.asList(
                 new Trade("T1", ProductType.FX, 1_000_000.0, "EUR",
-                        new Counterparty("Bank A"), new Portfolio("Portfolio 1")),
+                        new Counterparty("Bank A"),
+                        new Portfolio("Portfolio 1"),
+                        new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)),
+
                 new Trade("T2", ProductType.BOND, 2_000_000.0, "EUR",
-                        new Counterparty("Bank B"), new Portfolio("Portfolio 1")),
+                        new Counterparty("Bank B"),
+                        new Portfolio("Portfolio 1"),
+                        new BondTradeDetails("DE0001234567", "Issuer A", "2030-12-31", 0.035)),
+
                 new Trade("T3", ProductType.FX, 500_000.0, "USD",
-                        new Counterparty("Bank A"), new Portfolio("Portfolio 2"))
+                        new Counterparty("Bank A"),
+                        new Portfolio("Portfolio 2"),
+                        new FxTradeDetails("USD/JPY", "2026-07-16", 155.25))
         );
 
         Map<String, Double> sums = analytics.sumNominalByPortfolio(trades);

@@ -1,14 +1,17 @@
 package com.adrian.tradeengine.service;
 
 import com.adrian.tradeengine.io.TradeCsvParser;
+import com.adrian.tradeengine.model.BondTradeDetails;
+import com.adrian.tradeengine.model.FxTradeDetails;
 import com.adrian.tradeengine.model.Trade;
 import com.adrian.tradeengine.validation.TradeValidator;
 import org.junit.jupiter.api.Test;
-import java.util.Arrays;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TradeImportServiceTest {
 
@@ -28,7 +31,11 @@ public class TradeImportServiceTest {
         List<Trade> trades = importService.importValidTrades(lines);
 
         assertEquals(2, trades.size());
+
         assertEquals("T1", trades.get(0).getTradeId());
         assertEquals("T2", trades.get(1).getTradeId());
+
+        assertTrue(trades.get(0).getProductDetails() instanceof FxTradeDetails);
+        assertTrue(trades.get(1).getProductDetails() instanceof BondTradeDetails);
     }
 }

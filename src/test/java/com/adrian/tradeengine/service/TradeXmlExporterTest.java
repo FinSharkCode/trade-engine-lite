@@ -1,6 +1,7 @@
 package com.adrian.tradeengine.service;
 
 import com.adrian.tradeengine.model.Counterparty;
+import com.adrian.tradeengine.model.FxTradeDetails;
 import com.adrian.tradeengine.model.Portfolio;
 import com.adrian.tradeengine.model.ProductType;
 import com.adrian.tradeengine.model.Trade;
@@ -24,7 +25,8 @@ public class TradeXmlExporterTest {
                         1_000_000.0,
                         "EUR",
                         new Counterparty("Bank A"),
-                        new Portfolio("Portfolio 1")
+                        new Portfolio("Portfolio 1"),
+                        new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
                 )
         );
 
@@ -52,7 +54,8 @@ public class TradeXmlExporterTest {
                         500_000.0,
                         "EUR",
                         new Counterparty("Bank A & Co"),
-                        new Portfolio("Portfolio <Test>")
+                        new Portfolio("Portfolio <Test>"),
+                        new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
                 )
         );
 

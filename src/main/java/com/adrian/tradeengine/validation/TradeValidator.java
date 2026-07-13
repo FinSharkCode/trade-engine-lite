@@ -57,4 +57,5 @@ public class TradeValidator {
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
     }
+    
 }

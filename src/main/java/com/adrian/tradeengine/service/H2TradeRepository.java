@@ -4,6 +4,10 @@ import com.adrian.tradeengine.model.Counterparty;
 import com.adrian.tradeengine.model.Portfolio;
 import com.adrian.tradeengine.model.ProductType;
 import com.adrian.tradeengine.model.Trade;
+import com.adrian.tradeengine.model.BondTradeDetails;
+import com.adrian.tradeengine.model.EquityTradeDetails;
+import com.adrian.tradeengine.model.FxTradeDetails;
+import com.adrian.tradeengine.model.ProductDetails;
 
 import java.io.File;
 import java.sql.Connection;
@@ -138,13 +142,16 @@ public class H2TradeRepository implements TradeRepository {
     }
 
     private Trade mapRowToTrade(ResultSet resultSet) throws SQLException {
+        ProductType productType = ProductType.valueOf(resultSet.getString("product_type"));
+
         return new Trade(
                 resultSet.getString("trade_id"),
-                ProductType.valueOf(resultSet.getString("product_type")),
+                productType,
                 resultSet.getDouble("nominal"),
                 resultSet.getString("currency"),
                 new Counterparty(resultSet.getString("counterparty_name")),
-                new Portfolio(resultSet.getString("portfolio_name"))
+                new Portfolio(resultSet.getString("portfolio_name")),
+                createDefaultProductDetails(productType)
         );
     }
 
@@ -189,5 +196,21 @@ public class H2TradeRepository implements TradeRepository {
         String databasePath = databaseFile.getAbsolutePath().replace("\\", "/");
 
         return "jdbc:h2:file:" + databasePath;
+    }
+    
+    private ProductDetails createDefaultProductDetails(ProductType productType) {
+        if (productType == ProductType.FX) {
+            return new FxTradeDetails("EUR/USD", "2026-07-15", 1.08);
+        }
+
+        if (productType == ProductType.BOND) {
+            return new BondTradeDetails("DE0001234567", "Issuer A", "2030-12-31", 0.035);
+        }
+
+        if (productType == ProductType.EQUITY) {
+            return new EquityTradeDetails("AAPL", "NASDAQ", 100, 195.50);
+        }
+
+        return null;
     }
 }

@@ -1,16 +1,15 @@
 package com.adrian.tradeengine.validation;
 
 import com.adrian.tradeengine.model.Counterparty;
+import com.adrian.tradeengine.model.FxTradeDetails;
 import com.adrian.tradeengine.model.Portfolio;
 import com.adrian.tradeengine.model.ProductType;
 import com.adrian.tradeengine.model.Trade;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TradeValidatorTest {
 
@@ -24,7 +23,8 @@ public class TradeValidatorTest {
                 1_000_000.0,
                 "EUR",
                 new Counterparty("Bank A"),
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
         assertTrue(validator.isValid(trade));
@@ -38,7 +38,8 @@ public class TradeValidatorTest {
                 1_000_000.0,
                 "EUR",
                 new Counterparty("Bank A"),
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
         assertFalse(validator.isValid(trade));
@@ -52,7 +53,8 @@ public class TradeValidatorTest {
                 0.0,
                 "EUR",
                 new Counterparty("Bank A"),
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
         assertFalse(validator.isValid(trade));
@@ -66,7 +68,8 @@ public class TradeValidatorTest {
                 500_000.0,
                 "",
                 new Counterparty("Bank A"),
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
         assertFalse(validator.isValid(trade));
@@ -80,7 +83,8 @@ public class TradeValidatorTest {
                 500_000.0,
                 "USD",
                 null,
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
         assertFalse(validator.isValid(trade));
@@ -94,7 +98,8 @@ public class TradeValidatorTest {
                 500_000.0,
                 "USD",
                 new Counterparty("Bank A"),
-                null
+                null,
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
         assertFalse(validator.isValid(trade));
@@ -102,33 +107,31 @@ public class TradeValidatorTest {
 
     @Test
     void shouldNotThrowForValidTrade() {
-        // Arrange
         Trade trade = new Trade(
                 "T6",
                 ProductType.FX,
                 1_500_000.0,
                 "EUR",
                 new Counterparty("Bank A"),
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
-        // Act + Assert
         validator.validateOrThrow(trade);
     }
 
     @Test
     void shouldThrowWhenTradeIdIsBlank() {
-        // Arrange
         Trade trade = new Trade(
                 "",
                 ProductType.FX,
                 1_500_000.0,
                 "EUR",
                 new Counterparty("Bank A"),
-                new Portfolio("Portfolio 1")
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("EUR/USD", "2026-07-15", 1.08)
         );
 
-        // Act + Assert
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> validator.validateOrThrow(trade)
@@ -136,5 +139,4 @@ public class TradeValidatorTest {
 
         assertTrue(exception.getMessage().contains("Trade ID"));
     }
-
 }
