@@ -4,6 +4,9 @@ import com.adrian.tradeengine.model.Counterparty;
 import com.adrian.tradeengine.model.FxTradeDetails;
 import com.adrian.tradeengine.model.Portfolio;
 import com.adrian.tradeengine.model.ProductType;
+import com.adrian.tradeengine.model.BondTradeDetails;
+import com.adrian.tradeengine.model.FxTradeDetails;
+
 import com.adrian.tradeengine.model.Trade;
 import org.junit.jupiter.api.Test;
 
@@ -138,5 +141,50 @@ public class TradeValidatorTest {
         );
 
         assertTrue(exception.getMessage().contains("Trade ID"));
+    }
+    
+    @Test
+    void shouldReturnFalseWhenProductDetailsAreMissing() {
+        Trade trade = new Trade(
+                "T_DETAILS_MISSING",
+                ProductType.FX,
+                1_000_000.0,
+                "EUR",
+                new Counterparty("Bank A"),
+                new Portfolio("Portfolio 1"),
+                null
+        );
+
+        assertFalse(validator.isValid(trade));
+    }
+
+    @Test
+    void shouldReturnFalseWhenProductDetailsDoNotMatchProductType() {
+        Trade trade = new Trade(
+                "T_WRONG_DETAILS",
+                ProductType.FX,
+                1_000_000.0,
+                "EUR",
+                new Counterparty("Bank A"),
+                new Portfolio("Portfolio 1"),
+                new BondTradeDetails("DE0001234567", "Issuer A", "2030-12-31", 0.035)
+        );
+
+        assertFalse(validator.isValid(trade));
+    }
+
+    @Test
+    void shouldReturnFalseWhenFxCurrencyPairIsBlank() {
+        Trade trade = new Trade(
+                "T_BAD_FX",
+                ProductType.FX,
+                1_000_000.0,
+                "EUR",
+                new Counterparty("Bank A"),
+                new Portfolio("Portfolio 1"),
+                new FxTradeDetails("", "2026-07-15", 1.08)
+        );
+
+        assertFalse(validator.isValid(trade));
     }
 }
