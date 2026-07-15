@@ -15,8 +15,13 @@
             color: #1f4e79;
         }
 
+        h2 {
+            margin-top: 28px;
+            color: #1f4e79;
+        }
+
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             background: white;
             padding: 24px;
             border-radius: 8px;
@@ -25,7 +30,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: 160px 1fr;
+            grid-template-columns: 180px 1fr;
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -51,6 +56,7 @@
             font-weight: bold;
             cursor: pointer;
             margin-right: 8px;
+            margin-top: 8px;
         }
 
         button:hover {
@@ -66,8 +72,38 @@
             white-space: pre-wrap;
         }
 
+        .product-section {
+            margin-top: 20px;
+            padding: 16px;
+            border: 1px solid #dbe3ec;
+            border-radius: 6px;
+            background-color: #f8fafc;
+        }
+
         .trades {
             margin-top: 24px;
+        }
+
+        .trade-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8fafc;
+            border: 1px solid #dbe3ec;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .trade-text {
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .small-button {
+            padding: 6px 10px;
+            font-size: 12px;
+            margin-top: 0;
         }
 
         pre {
@@ -76,6 +112,7 @@
             padding: 16px;
             border-radius: 6px;
             white-space: pre-wrap;
+            overflow-x: auto;
         }
 
         .hint {
@@ -83,44 +120,31 @@
             font-size: 13px;
             margin-bottom: 20px;
         }
-        
-        .trade-row {
-		    display: flex;
-		    justify-content: space-between;
-		    align-items: center;
-		    background-color: #f8fafc;
-		    border: 1px solid #dbe3ec;
-		    border-radius: 4px;
-		    padding: 10px;
-		    margin-bottom: 8px;
-		}
-		
-		.trade-text {
-		    font-family: Consolas, monospace;
-		    font-size: 13px;
-		}
-		
-		.small-button {
-		    padding: 6px 10px;
-		    font-size: 12px;
-		}
+
+        code {
+            background-color: #eef2f7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
     </style>
 </head>
-<body>
+<body onload="initializePage()">
 <div class="container">
     <h1>Trade Engine Lite</h1>
 
     <p class="hint">
-        Simple local GUI for entering trades. The form sends CSV text to the REST endpoint
-        <code>/api/trades</code>.
+        Simple local GUI for entering product-specific trades. The form sends CSV text to
+        <code>/api/trades</code>. The backend parses, validates, stores in H2, and exports XML.
     </p>
+
+    <h2>Basisdaten</h2>
 
     <div class="form-grid">
         <label for="tradeId">Trade ID</label>
-        <input id="tradeId" value="T10">
+        <input id="tradeId" value="FX_UI_1">
 
         <label for="productType">Product Type</label>
-        <select id="productType">
+        <select id="productType" onchange="updateProductFields()">
             <option value="FX">FX</option>
             <option value="BOND">BOND</option>
             <option value="EQUITY">EQUITY</option>
@@ -139,24 +163,93 @@
         <input id="portfolio" value="Portfolio 1">
     </div>
 
+    <div id="fxFields" class="product-section">
+        <h2>FX Details</h2>
+        <div class="form-grid">
+            <label for="fxCurrencyPair">Currency Pair</label>
+            <input id="fxCurrencyPair" value="EUR/USD">
+
+            <label for="fxSettlementDate">Settlement Date</label>
+            <input id="fxSettlementDate" value="2026-07-15">
+
+            <label for="fxExchangeRate">Exchange Rate</label>
+            <input id="fxExchangeRate" type="number" step="0.0001" value="1.08">
+        </div>
+    </div>
+
+    <div id="bondFields" class="product-section">
+        <h2>Bond Details</h2>
+        <div class="form-grid">
+            <label for="bondIsin">ISIN</label>
+            <input id="bondIsin" value="DE0001234567">
+
+            <label for="bondIssuer">Issuer</label>
+            <input id="bondIssuer" value="Issuer A">
+
+            <label for="bondMaturityDate">Maturity Date</label>
+            <input id="bondMaturityDate" value="2030-12-31">
+
+            <label for="bondCouponRate">Coupon Rate</label>
+            <input id="bondCouponRate" type="number" step="0.0001" value="0.035">
+        </div>
+    </div>
+
+    <div id="equityFields" class="product-section">
+        <h2>Equity Details</h2>
+        <div class="form-grid">
+            <label for="equityTicker">Ticker</label>
+            <input id="equityTicker" value="AAPL">
+
+            <label for="equityExchange">Exchange</label>
+            <input id="equityExchange" value="NASDAQ">
+
+            <label for="equityQuantity">Quantity</label>
+            <input id="equityQuantity" type="number" value="100">
+
+            <label for="equityPrice">Price</label>
+            <input id="equityPrice" type="number" step="0.01" value="195.50">
+        </div>
+    </div>
+
     <button onclick="saveTrade()">Trade speichern</button>
     <button onclick="loadTrades()">Trades laden</button>
     <button onclick="fillInvalidTrade()">Ungültigen Trade testen</button>
+    <button onclick="fillFxExample()">FX Beispiel</button>
+    <button onclick="fillBondExample()">Bond Beispiel</button>
+    <button onclick="fillEquityExample()">Equity Beispiel</button>
 
     <div id="message" class="message">Noch keine Aktion ausgeführt.</div>
 
     <div class="trades">
-    	<h2>Gespeicherte Trades</h2>
-    	<div id="tradesOutput">Noch keine Trades geladen.</div>
-	</div>
+        <h2>Gespeicherte Trades</h2>
+        <div id="tradesOutput">Noch keine Trades geladen.</div>
+    </div>
 
-	<div class="trades">
-    	<h2>XML für ausgewählten Trade</h2>
-    	<pre id="xmlOutput">Noch kein Trade ausgewählt.</pre>
-	</div>
+    <div class="trades">
+        <h2>XML für ausgewählten Trade</h2>
+        <pre id="xmlOutput">Noch kein Trade ausgewählt.</pre>
+    </div>
 </div>
 
 <script>
+    function initializePage() {
+        updateProductFields();
+        loadTrades();
+    }
+
+    function updateProductFields() {
+        const productType = document.getElementById("productType").value;
+
+        document.getElementById("fxFields").style.display =
+            productType === "FX" ? "block" : "none";
+
+        document.getElementById("bondFields").style.display =
+            productType === "BOND" ? "block" : "none";
+
+        document.getElementById("equityFields").style.display =
+            productType === "EQUITY" ? "block" : "none";
+    }
+
     function buildCsvLine() {
         const tradeId = document.getElementById("tradeId").value;
         const productType = document.getElementById("productType").value;
@@ -165,12 +258,37 @@
         const counterparty = document.getElementById("counterparty").value;
         const portfolio = document.getElementById("portfolio").value;
 
-        return tradeId + "," +
+        const baseCsv = tradeId + "," +
             productType + "," +
             nominal + "," +
             currency + "," +
             counterparty + "," +
             portfolio;
+
+        if (productType === "FX") {
+            return baseCsv + "," +
+                document.getElementById("fxCurrencyPair").value + "," +
+                document.getElementById("fxSettlementDate").value + "," +
+                document.getElementById("fxExchangeRate").value;
+        }
+
+        if (productType === "BOND") {
+            return baseCsv + "," +
+                document.getElementById("bondIsin").value + "," +
+                document.getElementById("bondIssuer").value + "," +
+                document.getElementById("bondMaturityDate").value + "," +
+                document.getElementById("bondCouponRate").value;
+        }
+
+        if (productType === "EQUITY") {
+            return baseCsv + "," +
+                document.getElementById("equityTicker").value + "," +
+                document.getElementById("equityExchange").value + "," +
+                document.getElementById("equityQuantity").value + "," +
+                document.getElementById("equityPrice").value;
+        }
+
+        return baseCsv;
     }
 
     function saveTrade() {
@@ -185,7 +303,7 @@
         })
             .then(response => response.text())
             .then(text => {
-                document.getElementById("message").textContent = text;
+                document.getElementById("message").textContent = text + "\n\nCSV sent:\n" + csvLine;
                 loadTrades();
             })
             .catch(error => {
@@ -203,7 +321,7 @@
                 document.getElementById("tradesOutput").textContent = "Error: " + error;
             });
     }
-    
+
     function renderTrades(text) {
         const output = document.getElementById("tradesOutput");
         output.innerHTML = "";
@@ -237,7 +355,7 @@
             output.appendChild(row);
         });
     }
-    
+
     function loadTradeXml(tradeId) {
         fetch("api/trades/" + encodeURIComponent(tradeId) + "/xml")
             .then(response => response.text())
@@ -250,12 +368,65 @@
     }
 
     function fillInvalidTrade() {
-        document.getElementById("tradeId").value = "T_INVALID";
+        document.getElementById("tradeId").value = "INVALID_" + Date.now();
         document.getElementById("productType").value = "FX";
         document.getElementById("nominal").value = "0";
         document.getElementById("currency").value = "EUR";
         document.getElementById("counterparty").value = "Bank A";
         document.getElementById("portfolio").value = "Portfolio 1";
+
+        document.getElementById("fxCurrencyPair").value = "EUR/USD";
+        document.getElementById("fxSettlementDate").value = "2026-07-15";
+        document.getElementById("fxExchangeRate").value = "1.08";
+
+        updateProductFields();
+    }
+
+    function fillFxExample() {
+        document.getElementById("tradeId").value = "FX_UI_" + Date.now();
+        document.getElementById("productType").value = "FX";
+        document.getElementById("nominal").value = "1000000";
+        document.getElementById("currency").value = "EUR";
+        document.getElementById("counterparty").value = "Bank FX";
+        document.getElementById("portfolio").value = "Portfolio FX";
+
+        document.getElementById("fxCurrencyPair").value = "EUR/USD";
+        document.getElementById("fxSettlementDate").value = "2026-07-15";
+        document.getElementById("fxExchangeRate").value = "1.08";
+
+        updateProductFields();
+    }
+
+    function fillBondExample() {
+        document.getElementById("tradeId").value = "BOND_UI_" + Date.now();
+        document.getElementById("productType").value = "BOND";
+        document.getElementById("nominal").value = "2000000";
+        document.getElementById("currency").value = "EUR";
+        document.getElementById("counterparty").value = "Bank Bond";
+        document.getElementById("portfolio").value = "Portfolio Bond";
+
+        document.getElementById("bondIsin").value = "DE0001234567";
+        document.getElementById("bondIssuer").value = "Issuer A";
+        document.getElementById("bondMaturityDate").value = "2030-12-31";
+        document.getElementById("bondCouponRate").value = "0.035";
+
+        updateProductFields();
+    }
+
+    function fillEquityExample() {
+        document.getElementById("tradeId").value = "EQ_UI_" + Date.now();
+        document.getElementById("productType").value = "EQUITY";
+        document.getElementById("nominal").value = "500000";
+        document.getElementById("currency").value = "USD";
+        document.getElementById("counterparty").value = "Bank Equity";
+        document.getElementById("portfolio").value = "Portfolio Equity";
+
+        document.getElementById("equityTicker").value = "AAPL";
+        document.getElementById("equityExchange").value = "NASDAQ";
+        document.getElementById("equityQuantity").value = "100";
+        document.getElementById("equityPrice").value = "195.50";
+
+        updateProductFields();
     }
 </script>
 </body>
