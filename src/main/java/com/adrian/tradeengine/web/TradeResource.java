@@ -6,7 +6,13 @@ import com.adrian.tradeengine.service.H2TradeRepository;
 import com.adrian.tradeengine.service.TradeRepository;
 import com.adrian.tradeengine.service.TradeXmlExporter;
 import com.adrian.tradeengine.validation.TradeValidator;
+import com.adrian.tradeengine.service.BondCashflowService;
+import com.adrian.tradeengine.service.BondPricingService;
+import com.adrian.tradeengine.service.TradePricingService;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
+import java.util.Locale;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,6 +31,7 @@ public class TradeResource {
     private final TradeCsvParser parser = new TradeCsvParser();
     private final TradeValidator validator = new TradeValidator();
     private final TradeXmlExporter xmlExporter = new TradeXmlExporter();
+    private final TradePricingService tradePricingService;
 
     public TradeResource() {
         this(DEFAULT_REPOSITORY);
@@ -32,6 +39,11 @@ public class TradeResource {
 
     TradeResource(TradeRepository repository) {
         this.repository = repository;
+        this.tradePricingService = new TradePricingService(
+                repository,
+                new BondCashflowService(),
+                new BondPricingService()
+        );
     }
 
     @POST
@@ -98,6 +110,30 @@ public class TradeResource {
         }
 
         return xmlExporter.exportSingleTrade(trade);
+    }
+    
+    @GET
+    @Path("/{tradeId}/price")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getBondPrice(
+            @PathParam("tradeId") String tradeId,
+            @QueryParam("discountRate") @DefaultValue("0.04") double discountRate,
+            @QueryParam("yearsToMaturity") @DefaultValue("5") int yearsToMaturity
+    ) {
+        try {
+            double presentValue = tradePricingService.priceBondTrade(
+                    tradeId,
+                    discountRate,
+                    yearsToMaturity
+            );
+
+            return "Present value for trade "
+                    + tradeId
+                    + ": "
+                    + String.format(Locale.US, "%.2f", presentValue);
+        } catch (IllegalArgumentException exception) {
+            return "Pricing error: " + exception.getMessage();
+        }
     }
     
 }

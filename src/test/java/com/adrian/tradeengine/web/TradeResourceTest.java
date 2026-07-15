@@ -97,4 +97,54 @@ public class TradeResourceTest {
         assertTrue(response.contains("Bank XML Single"));
         assertTrue(response.contains("Portfolio XML Single"));
     }
+    
+    @Test
+    void shouldReturnBondPrice() {
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
+
+        resource.createTrade(
+                "BOND_PRICE_RESOURCE,BOND,1000000,EUR,Bank Bond,Portfolio Bond,DE0001234567,Issuer A,2030-12-31,0.03"
+        );
+
+        String response = resource.getBondPrice(
+                "BOND_PRICE_RESOURCE",
+                0.04,
+                5
+        );
+
+        assertTrue(response.contains("Present value for trade BOND_PRICE_RESOURCE"));
+        assertTrue(response.contains("955481.78"));
+    }
+
+    @Test
+    void shouldReturnPricingErrorWhenTradeIsNotBond() {
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
+
+        resource.createTrade(
+                "FX_PRICE_RESOURCE,FX,1000000,EUR,Bank FX,Portfolio FX,EUR/USD,2026-07-15,1.08"
+        );
+
+        String response = resource.getBondPrice(
+                "FX_PRICE_RESOURCE",
+                0.04,
+                5
+        );
+
+        assertTrue(response.contains("Pricing error"));
+        assertTrue(response.contains("not a bond"));
+    }
+
+    @Test
+    void shouldReturnPricingErrorWhenTradeDoesNotExist() {
+        TradeResource resource = new TradeResource(new InMemoryTradeRepository());
+
+        String response = resource.getBondPrice(
+                "UNKNOWN_PRICE_RESOURCE",
+                0.04,
+                5
+        );
+
+        assertTrue(response.contains("Pricing error"));
+        assertTrue(response.contains("Trade not found"));
+    }
 }
